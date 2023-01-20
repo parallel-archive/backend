@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  sonarqube:
+    image: "sonarqube:latest"
+    container_name: "sonarqube"
+    networks: ["osa"]
+    hostname: "sonarqube"
+    depends_on: ["postgresql"]
+    restart: "always"
+    tty: true
+    ports:
+      - "9000:9000"
+      - "9092:9092" # Only needed when using the embedded H2 database
+    volumes:
+      - ./docker-data/sonarqube/data:/opt/sonarqube/data
+      - ./docker-data/sonarqube/logs:/opt/sonarqube/logs
+      - ./docker-data/sonarqube/extensions:/opt/sonarqube/extensions
+    environment:
+      sonar__jdbc__url: jdbc:postgresql://localhost:5432/sonarqube
+      sonar__jdbc__username: sonarqube
+      sonar__jdbc__password: sonarqube1234
+
+  postgresql:
+    image: "postgres:latest"
+    restart: "always"
+    hostname: "postgres"
+    networks: ["osa"]
+    tty: true
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: sonarqube1234
+      POSTGRES_USER: sonarqube
+      POSTGRES_DB: sonarqube
+      POSTGRES_INITDB_ARGS: "--encoding='UTF8'"
+    volumes:
+      - ./docker-data/postgres/data:/var/lib/postgresql/data
+
+  mariadb:
+    image: "mariadb:latest"
+    restart: "always"
+    networks: ["osa"]
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_USER: osa
+      MARIADB_ROOT_PASSWORD: osa1234
+      MARIADB_DATABASE: osa
+    volumes:
+      - ./docker-data/mariadb/data:/var/lib/mysql
+
+  admin-webapp:
+    image: "osa-backend:latest"
+    # build: .
+    restart: "always"
+    networks: ["osa"]
+    depends_on: ["mariadb"]
+    tty: true
+    environment:
+      MARIADB_URL: jdbc:mysql://localhost:3306/osa
+      MARIADB_USERNAME: osa
+      MARIADB_PASSWORD: osa1234
+    ports:
+      - "8080:8080" # web port
+      - "8000:8000" # debug port
+networks:
+  osa:
+    external: false

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+  <link rel="stylesheet" th:href="@{/css/accountforms.css}"/>
+  <script async defer th:data-website-id="${@environment.getProperty('osa.umami.data-website-id')}" th:src="@{|${@environment.getProperty('osa.baseUrl')}/umami/umami.js|}"></script>
+  <title>Parallel Archive</title>
+</head>
+<body>
+    <div class="center-content register-content">
+        <div>
+            <form action="#" th:action="@{/register}" th:object="${registrationData}" method="post">
+                <h1>Register</h1>
+                <div class="client-error" hidden="hidden">
+                    <p class="client-error__copy">Passwords don't match.</p>
+                    <img th:src="@{/css/warning.svg}" alt="" width="15" height="15">
+                </div>
+                <label class="styled-input-label" for="email">E-mail</label>
+                <input
+                required
+                type="email"
+                name="email"
+                placeholder="example@mail.com"
+                th:field="*{email}"
+                class="styled-input"/>
+                <p th:if="${#fields.hasErrors('email')}" th:errorclass="form-error" th:errors="*{email}"></p>
+
+                <label class="styled-input-label" for="password">Password</label>
+                <input
+                required
+                type="password"
+                name="password"
+                minlength="7"
+                placeholder=""
+                th:field="*{password}"
+                class="styled-input"
+                pwd-1/>
+                <p th:if="${#fields.hasErrors('password')}" th:errorclass="form-error" th:errors="*{password}"></p>
+                
+                <label class="styled-input-label" for="repeatpassword">Repeat Password</label>
+                <input
+                required
+                type="password"
+                name="repeatpassword"
+                minlength="7"
+                placeholder=""
+                th:field="*{repeatPassword}"
+                class="styled-input"
+                pwd-2/>
+                <p th:if="${#fields.hasErrors('repeatPassword')}" th:errorclass="form-error" th:errors="*{repeatPassword}"></p>
+                
+                <button type="submit" class="button button-primary-500 umami--click--new-account-registration">Register</button>
+                <div th:if="${not #strings.isEmpty(success) and not #strings.isEmpty(success.user) and not #strings.isEmpty(success.user.name) }"> We've sent an email. Click the link to confirm your registration.</div>
+
+                <div th:if="${#fields.hasErrors('global')}" th:replace="fragments/error :: errors(${#fields.errors('global')})">
+				
+            </form> 
+            <div class="container">
+                <div>Have an account already?</div>
+                <a href="/login" class="button button-ghost-500 login">Login</a>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" th:src="@{/js/utils.js}"></script>
+</body>
+</html>

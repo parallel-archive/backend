@@ -1,0 +1,66 @@
+<div id="globalmenu" th:fragment="globalmenu (page, userMenuData)"
+    data-user-menu-open="false">
+    <div class="menu" th:classappend="${page == 'IPFS' ? '' : 'slim'}">
+        <div class="hamburger" th:onclick="gm.openDrawerMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <span class="currentPage" th:text="${page}"></span>
+        <div class="navigation-content fancy-scroll">
+            <img class="mobile-menu-close" th:onclick="gm.closeDrawerMenu()"/>
+            <div class="menu-items">
+                <div>
+                    <a href="/"
+                    data-selected="false"
+                    menu-item
+                    >Public Documents
+                    </a>
+                    <a th:href="@{|${@environment.getProperty('osa.appBaseUrl')}/uploadedimages|}"
+                    data-selected="false"
+                    menu-item
+                    th:text="@{${userMenuData != null && userMenuData.myShoeBoxSize != null} ? |Uploaded Images (${userMenuData.myShoeBoxSize})| : 'Uploaded Images'}"
+                    ></a>
+                    <a th:href="@{|${@environment.getProperty('osa.appBaseUrl')}/privatedocuments|}"
+                    data-selected="false"
+                    menu-item
+                    th:text="@{${userMenuData != null && userMenuData.documentsSize != null} ? |Private Documents (${userMenuData.documentsSize})| : 'Private Documents'}"
+                    ></a>
+                    <a href="/privatecollections/mydocuments"
+                    data-selected="false"
+                    globalmenu-login
+                    target="/privatecollections/mydocuments"
+                    sec:authorize="not isAuthenticated()"
+                    menu-item
+                    >Private Collections
+                    </a>
+                    <a href="/privatecollections/mydocuments"
+                    data-selected="false"
+                    sec:authorize="isAuthenticated()"
+                    menu-item
+                    >Private Collections
+                    </a>
+                </div>
+                <div class="bottom">
+                    <a href="#"
+                        class="user-desktop"
+                        sec:authorize="not isAuthenticated()"
+                        globalmenu-login
+                        target="/"
+                    >Login</a>
+                    <a href="/changepassword"
+                        data-selected="false"
+                        menu-item
+                        globalmenu-account
+                        sec:authorize="isAuthenticated()"
+                    >
+                    <svg class="user-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    My Account</a>
+                </div>
+            </div>
+        </div>
+        <div class="backdrop" th:onclick="gm.closeDrawerMenu()"></div>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "Running Maven clean test for errors"
+mvn clean test -P unittest
+if [ $? -ne 0 ]; then
+  echo "Error while testing the code"
+  exit 1
+fi
+
+#echo "Analyze project with Sonar"
+#./mvnw sonar:sonar
+#if [ $? -ne 0 ]; then
+#  echo "Error while analyzing the code"
+#  exit 1
+#fi

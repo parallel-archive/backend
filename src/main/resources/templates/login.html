@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+  <link rel="stylesheet" th:href="@{/css/accountforms.css}"/>
+  <script async defer th:data-website-id="${@environment.getProperty('osa.umami.data-website-id')}" th:src="@{|${@environment.getProperty('osa.baseUrl')}/umami/umami.js|}"></script>
+  <title>Parallel Archive</title>
+</head>
+<body>
+    <div class="center-content" id="login">
+        <div>
+            <form action="#" th:action="@{/login}" method="post" class="login-form">
+                <h1>Login</h1>
+                <div th:if="${param.error}" class="client-error">
+                    <p class="client-error__copy">Bad credentials.</p>
+                    <img th:src="@{/css/warning.svg}" alt="" width="15" height="15">
+                </div>
+                <div th:if="${param.logout}" class="client-error">
+                    <p class="client-error__copy">You have been logged out.</p>
+                    <img th:src="@{/css/warning.svg}" alt="" width="15" height="15">
+                </div>
+                <input type="hidden" name="targetUrl" th:value="${targetUrl != null ? targetUrl: ''}">
+                <label class="styled-input-label" for="email">E-mail</label>
+                <input
+                required
+                type="email"
+                name="username"
+                placeholder="example@mail.com"
+                class="styled-input"/>
+                <label class="styled-input-label" for="password">Password</label>
+                <input
+                required
+                type="password"
+                name="password"
+                placeholder=""
+                class="styled-input"/>
+                <button type="submit" class="button button-primary-500">Login</button>
+            </form>
+            <div class="container">
+                <div>Don't have an account? <a href="/register">Register</a></div>
+                <a href="/forgotpassword">Forgot password?</a>
+            </div> 
+        </div>
+    </div>
+</body>
+</html>

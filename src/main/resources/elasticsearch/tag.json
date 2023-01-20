@@ -1,0 +1,22 @@
+{
+	"index": 	{
+	   "analysis":{
+	      "analyzer":{
+	         "documentTagAnalyzer":{
+				"type" : "custom",
+	            "tokenizer":"documentTagTokenizer"
+	         }
+	      },
+	      "tokenizer":{
+	         "documentTagTokenizer":{
+	            "type":"edge_ngram",
+	            "min_gram":3,
+	            "max_gram":100,
+	            "token_chars":[
+	               "letter"
+	            ]
+	         }
+	      }
+	   }
+	}
+}

@@ -1,0 +1,39 @@
+<div class="modal" id="login-modal" th:fragment="login">
+    <div class="modal-body">
+        <div class="modal-content">
+            <form th:action="@{/login}" method="post" class="login-form">
+                <h1>Login</h1>
+                <div th:if="${param.error}" class="client-error">
+                    <p class="client-error__copy">Bad credentials.</p>
+                    <img th:src="@{/css/warning.svg}" alt="" width="15" height="15">
+                </div>
+                <div th:if="${param.logout}" class="client-error">
+                    <p class="client-error__copy">You have been logged out.</p>
+                    <img th:src="@{/css/warning.svg}" alt="" width="15" height="15">
+                </div>
+                <input type="hidden" name="targetUrl" value="">
+                <label class="styled-input-label" for="email">E-mail</label>
+                <input
+                type="email"
+                name="username"
+                placeholder="example@mail.com"
+                class="styled-input"/>
+                <label class="styled-input-label" for="password">Password</label>
+                <input
+                type="password"
+                name="password"
+                placeholder=""
+                class="styled-input"/>
+                <div class="flex flex-end">
+                    <button class="mt-1 mr-1 button button-primary-500" id="login-close">Cancel</button>
+                    <button class="mt-1 button button-primary-500" type="submit" tabindex="1" id="login-submit">Login</button>
+                </div>
+
+            </form>
+            <div class="container">
+                <div>Don't have an account? <a href="/register">Register</a></div>
+                <a href="/forgotpassword">Forgot password?</a>
+            </div>
+        </div>
+    </div>
+</div>

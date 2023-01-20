@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN" "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<suppressions>
+  <!-- relax rules in unit tests, we need less docs and magic numbers are commonplace in tests -->
+  <suppress 
+  	checks="JavadocMethod|IllegalInstantiation|IllegalThrows|MagicNumber|NPathComplexity|ClassFanOutComplexity|ClassDataAbstractionCoupling|MethodCount|MethodLength|ParameterNumber" 
+  	files=".*Mock.*java|.*Test.java|.*EntityFactory\.java|.*DatabaseTestConfiguration\.java|.*DatabaseProfileConfiguration\.java" />
+  <!-- relax rules in package info files, they are not real classes -->
+  <suppress checks="RegexpHeader" files=".*package-info.java" />
+  <!-- relax rules in jsp files, they are not real classes -->
+  <suppress checks="RegexpHeader" files=".*\.jsp" />
+  <suppress checks=".*" files=".*\.properties" />
+  <suppress checks=".*" files=".*\.jar" />
+  <suppress checks=".*" files=".*\.sql" />
+  <suppress checks=".*" files=".*\.xml" />
+  <suppress checks="ConstantName|MagicNumber|FileLength" files=".*ContentTypes\.java" />
+  <suppress checks="NPathComplexity" files=".*ErpCharacteristicValueKey\.java" />
+
+  <!-- temporary (need to be fixed someday) rules relaxation -->
+
+</suppressions>

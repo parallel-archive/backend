@@ -1,0 +1,33 @@
+<div class="bottom-container" th:fragment="pagination(documents)" th:with="documents=${documents}, activeTags=${activeTags} ?: []" th:if="${documents.totalPages > 1}">
+    <div class="control-panel" th:if="${documents.numberOfElements > 0}">
+        <input type="hidden" th:name="size" th:value="${documents.size}">
+        <input type="hidden" th:name="tag" th:if="${not #lists.isEmpty(activeTags)}" th:value="${activeTags[0]}">
+        <button type="submit" th:disabled="${documents.first}" class="button arrow beginning" th:name="page" th:value="0" @click=${this.beginning}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#dd382d">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            </svg>
+        </button>
+        <button type="submit" th:disabled="${documents.first}" th:name="page" th:value="${documents.number-1}" class="button arrow" @click=${this.back}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#dd382d">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <div class="numbers" th:name="page" th:value="${documents.number}+1">
+            <span th:text="${documents.size} * ${documents.number} + 1"></span>
+            <span> - </span>
+            <span th:text="${(documents.size * documents.number) + documents.numberOfElements}"></span>
+            <span> of </span>
+            <span class="of-total" th:text="${documents.totalElements}"></span>
+        </div>
+        <button type="submit" th:disabled=${documents.last} class="button arrow" th:name="page" th:value="${documents.number+1}" @click=${this.forward} >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#dd382d">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+        <button type="submit" th:name="page" th:value="${documents.totalPages-1}" th:disabled="${documents.last}" class="button arrow end" @click=${this.end}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#dd382d">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+        </button>
+    </div>
+</div>

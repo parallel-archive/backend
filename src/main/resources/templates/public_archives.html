@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+  <link rel="stylesheet" th:href="@{/css/accountforms.css}"/>
+  <link rel="stylesheet" th:href="@{/css/globalmenu.css}"/>
+  <link rel="stylesheet" th:href="@{/css/publicarchive.css}"/>
+  <link rel="stylesheet" th:href="@{/css/accordion.css}"/>
+  <link rel="stylesheet" th:href="@{/css/collections.css}"/>
+  <script async defer th:data-website-id="${@environment.getProperty('osa.umami.data-website-id')}" th:src="@{|${@environment.getProperty('osa.baseUrl')}/umami/umami.js|}"></script>
+  <title>Parallel Archive</title>
+</head>
+<body>
+    <main class="main">
+        <div class="error-snackbar">
+            <span class="error-snackbar-content"></span>
+            <button id="error-snackbar-close"></button>
+        </div>
+        <div th:replace="fragments/login.html :: login"></div>
+        <div class="modal" id="atc-warning">
+            <div class="modal-body">
+                <div class="modal-content">
+                    <p>You must be logged in to save to collection.</p>
+                    <div class="flex flex-end">
+                        <button class="mt-1 mr-1 button button-primary-500" id="warning-close">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="collections-modal" id="rename-collection-modal">
+            <div class="collections-modal-body" th:if="${collectionsData != null and not #lists.isEmpty(collectionsData.collections)}">
+                <div class="collections-modal-content">
+                    <div class="save-to-collection-form">
+                        <div class="collections-modal-header">
+                            <p>Save publication to collection</p>
+                            <div class="text-right">
+                                <button class="button button-ghost-500" id="save-to-collection-cancel">Cancel</button>
+                                <button class="button button-primary-500" id="save-to-collection-submit" disabled>Save</button>
+                            </div>
+                        </div>
+                        <ul class="collections-list">
+                            <li th:each="collection: ${collectionsData.collections}" class="font-weight-light">
+                                <input th:id="@{collection-{id}(id=${collection.id})}" th:attr="data-id=${collection.id}" type="checkbox" class="radio-like-checkbox"/>
+                                <label th:for="@{collection-{id}(id=${collection.id})}" th:text="${collection.name}"></label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="collections-modal-body" th:if="${collectionsData != null and #lists.isEmpty(collectionsData.collections)}">
+                <div class="collections-modal-content">
+                    <h2 class="font-weight-light mt-0">Create new collection</h2>
+                    <form action="/privatecollections" method="POST" id="create-collection-form">
+                        <label for="collection-name" class="font-bold">Name</label>
+                        <input type="text" pattern=".*\S+.*" required name="name" id="collection-name">
+                        <input type="hidden" name="publication" id="publication-hash">
+                        <div class="text-right">
+                            <button id="create-collection-cancel" class="mt-1 button button-ghost-500">Cancel</button>
+                            <button id="create-collection-submit" class="mt-1 button button-primary-500">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <form id="publicarchive" th:action="@{/}" method="get">
+            <div th:replace="fragments/globalmenu.html :: globalmenu (page='Public Documents', userMenuData=${userMenuData})"></div>
+            <label for="filtering-modal" filtering-modal></label>
+            <div class="content">
+                <div class="modal-header"><span class="close"></span></div>
+                <input type="checkbox" name="" id="filtering-modal">
+                <div class="action-buttons fancy-scroll">
+                    <div id="search">
+                        <div class="search-container">
+                            <div class="search-input-wrap">
+                                <input class="" type="text" name="searchTerm" id="search-input" placeholder="Search" th:value="${searchTerm} ? ${searchTerm} : ''">
+                                <button th:if="${searchTerm == null or searchTerm == '' or #strings.isEmpty(searchTerm)}" class="svg-wrap search-button" type="submit">
+                                    <svg class="search" search-submit xmlns="http://www.w3.org/2000/svg" viewBox="0 0 487.95 487.95" fill="currentColor" style="enable-background:new 0 0 487.95 487.95" xml:space="preserve"><path d="m481.8 453-140-140.1c27.6-33.1 44.2-75.4 44.2-121.6C386 85.9 299.5.2 193.1.2S0 86 0 191.4s86.5 191.1 192.9 191.1c45.2 0 86.8-15.5 119.8-41.4l140.5 140.5c8.2 8.2 20.4 8.2 28.6 0 8.2-8.2 8.2-20.4 0-28.6zM41 191.4c0-82.8 68.2-150.1 151.9-150.1s151.9 67.3 151.9 150.1-68.2 150.1-151.9 150.1S41 274.1 41 191.4z" fill="#5a5a5a"/></svg>
+                                </button>
+                                <button th:if="${searchTerm != null and searchTerm != '' or not #strings.isEmpty(searchTerm)}"  class="svg-wrap search-clear-button" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#f2b2ad">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button disabled sec:authorize="not isAuthenticated()" data-modal='atc-warning' class="button button-ghost-500" add-to-collection desktop>Add to collection</button>
+                    <button disabled="disabled" data-modal='collections' class="button button-ghost-500" sec:authorize="isAuthenticated()" add-to-collection desktop>Add to collection</button>
+
+                    <div th:replace="fragments/filters.html :: options"></div>
+                    <div th:replace="fragments/filters.html :: filters(filters=${documentFilterTypesData.filterTypes})"></div>
+                </div>
+                <div>
+                    <div class="mobile-subheader">
+                        <button disabled="disabled" data-modal='collections' class="" sec:authorize="isAuthenticated()" add-to-collection mobile>Add to collection</button>
+                        <button disabled sec:authorize="not isAuthenticated()" data-modal='atc-warning' class="button button-primary-500" add-to-collection mobile>Add to collection</button>
+                    </div>
+                    <div class="content-right">
+                        <div class="add-to-collection-container">
+                            <div class="options collections-sort">
+                                <select id="sort">
+                                    <option th:selected="${param.sort != null and param.sort[0] == 'DESC' and param.sortBy != null and param.sortBy[0] == 'DATE'}" value="DESC" sortby="DATE">Recently
+                                        published first</option>
+                                    <option th:selected="${param.sort != null and param.sort[0] == 'ASC' and param.sortBy != null and param.sortBy[0] == 'DATE'}" value="ASC" sortby="DATE">Recently
+                                        published last</option>
+                                    <option th:selected="${param.sort != null and param.sort[0] == 'DESC' and param.sortBy != null and param.sortBy[0] == 'VIEWS'}" value="DESC" sortby="VIEWS">Number of views descending</option>
+                                    <option th:selected="${param.sort != null and param.sort[0] == 'ASC' and param.sortBy != null and param.sortBy[0] == 'VIEWS'}" value="ASC" sortby="VIEWS">Number of views ascending</option>
+                                    <option th:selected="${param.sort != null and param.sort[0] == 'DESC' and param.sortBy != null and param.sortBy[0] == 'TITLE'}" value="DESC" sortby="TITLE">Alphabetically descending</option>
+                                    <option th:selected="${param.sort != null and param.sort[0] == 'ASC' and param.sortBy != null and param.sortBy[0] == 'TITLE'}" value="ASC" sortby="TITLE">Alphabetically ascending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div th:if="${searchTerm != null and searchTerm != ''}" class="searchterm-header">
+                            <div>
+                                <p>You have searched for:</p>
+                                <div class="searchterm-header__keyword-wrap">
+                                    <span th:text="|'${searchTerm}'|"></span>
+                                    <button th:if="${searchTerm != null or not #strings.isEmpty(searchTerm)}"  class="svg-wrap search-clear-button" type="button">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="">
+                                            <path fill="#dd382d" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="active-tag-filters" th:if="${activeTags != null and not #lists.isEmpty(activeTags)}">
+                            <div>
+                                <p>Selected tags:</p>
+                                <span th:each="activeTag: ${activeTags}" th:text="${activeTag}" class="active-tag"></span>
+                            </div>
+                            <a class="button button-primary-500" th:href="@{/}">Clear tag filters</a>
+                        </div>
+                        <div class="publication-grid" th:classappend="${(searchTerm != null and searchTerm != '') or (activeTags != null and not #lists.isEmpty(activeTags)) ? 'search-on' : 'search-off'}">
+                            <div class="no-results" th:if="${publishedDocuments.documents.numberOfElements < 1}">We are sorry. We were not able to find a match.</div>
+                            <div class="publication-card" th:each="publication: ${publishedDocuments.documents.content}">
+                                <a th:href="${publication.url}" class="publication-link">
+                                    <div class="publication-image-container">
+                                        <img width="130" th:src="${publication.thumbnailUrl}">
+                                    </div>
+                                </a>
+                                <div class="publication-info">
+                                    <a th:href="${publication.url}" class="publication-link-wrapper">
+                                        <div class="publication-info__original-title-section">
+                                            <p class="publication-info__original-title" th:text="${publication.metaData.originalTitle}"></p>
+                                        </div>
+                                        <div class="publication-info__date-created-section">
+                                            <div th:if="${#arrays.length(publication.metaData.languages) <= 2}">
+                                                <span class="publication-info__language" th:each="language: ${publication.metaData.languages}" th:text="${language}"></span>
+                                            </div>
+                                            <div th:if="${#arrays.length(publication.metaData.languages) > 2}">
+                                                <span class="publication-info__language" th:text="${publication.metaData.languages[0]}" th:if="${publication.metaData.languages[0]}"></span>
+                                                <span class="publication-info__language" th:text="${publication.metaData.languages[1]}" th:if="${publication.metaData.languages[1]}"></span>
+                                                <span class="publication-info__language" th:if="${#arrays.length(publication.metaData.languages) - 2 > 0}" th:text="'+' + ${#arrays.length(publication.metaData.languages) - 2} + ' more'"></span>
+                                            </div>
+                                            <div>
+                                                <span class="label">Date Created:</span>
+                                                <span class="publication-info__date-created" th:text="${publication.metaData.createdAtYear}"></span>
+                                            </div>
+                                            <div class="publication-info__views">
+                                                <span class="label">Views:</span>
+                                                <span class="publication-info__views-number"
+                                                    th:text="${publication.views}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="publication-info__source-url-section">
+                                            <span class="label">Source:</span>
+                                            <span class="publication-info__date-created" th:text="${publication.metaData.sourceUrl}"></span>
+                                        </div>
+                                        <div class="publication-info__published-by">
+                                            <span class="label">Published by:</span>
+                                            <div class="flex">
+                                                <span class="publication-info__published-by-person" th:text="${publication.userName}"></span>
+                                                <span class="publication-info__published-by-date" th:text="${publication.createdAt}"></span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="publication-info__tags-section">
+                                        <span class="label">Top Tags:</span>
+                                        <div>
+                                            <a th:each="tag: ${publication.metaData.tags}" th:href="@{/(tag=${tag})}" th:text="${tag}" class="publication-info__tag"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" class="radio-like-checkbox" name="" th:id="${publication.url}" th:attr="data-url=${publication.url}" width="20" data-save-to-collection>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:replace="fragments/document-pagination.html :: pagination(documents=${publishedDocuments.documents},activeTags=${activeTags})"></div>
+            <div th:replace="fragments/globalfooter.html :: globalfooter"></div>
+        </form>
+        <div class="collections-modal" id="rename-collection-modal">
+            <div class="collections-modal-body" th:if="${collectionsData != null and not #lists.isEmpty(collectionsData.collections)}">
+                <div class="collections-modal-content">
+                    <div class="save-to-collection-form">
+                        <div class="collections-modal-header">
+                            <p>Save publication to collection</p>
+                            <div class="text-right">
+                                <button class="button button-ghost-500" id="save-to-collection-cancel">Cancel</button>
+                                <button class="button button-primary-500" id="save-to-collection-submit" disabled>Save</button>
+                            </div>
+                        </div>
+                        <ul class="collections-list">
+                            <li th:each="collection: ${collectionsData.collections}" class="font-weight-light">
+                                <input th:id="@{collection-m-{id}(id=${collection.id})}" th:attr="data-id=${collection.id}" type="ox"/>
+                                <label th:for="@{collection-m-{id}(id=${collection.id})}" th:text="${collection.name}"></label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="collections-modal-body" th:if="${collectionsData != null and #lists.isEmpty(collectionsData.collections)}">
+                <div class="collections-modal-content">
+                    <h2 class="font-weight-light mt-0">Create new collection</h2>
+                    <form action="/privatecollections" method="POST" id="create-collection-form">
+                        <label for="collection-name" class="font-bold">Name</label>
+                        <input type="text" pattern=".*\S+.*" required name="name" id="collection-name">
+                        <div class="text-right">
+                            <button id="create-collection-cancel" class="mt-1 button button-ghost-500">Cancel</button>
+                            <button id="create-collection-submit" class="mt-1 button button-primary-500">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script type="text/javascript" th:src="@{/js/utils.js}"></script>
+    <script type="text/javascript" th:src="@{/js/login.js}"></script>
+    <script type="text/javascript" th:src="@{/js/globalmenu.js}"></script>
+    <script type="text/javascript" th:src="@{/js/publicarchive.js}"></script>
+</body>
+</html>

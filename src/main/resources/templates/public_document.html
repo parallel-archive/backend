@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" th:href="@{/css/general.css}"/>
+  <link rel="stylesheet" th:href="@{/css/accountforms.css}"/>
+  <link rel="stylesheet" th:href="@{/css/globalmenu.css}"/>
+  <link rel="stylesheet" th:href="@{/css/publication.css}"/>
+  <link rel="stylesheet" th:href="@{/css/accordion.css}"/>
+  <link rel="stylesheet" th:href="@{/css/collections.css}"/>
+  <script async defer th:data-website-id="${@environment.getProperty('osa.umami.data-website-id')}" th:src="@{|${@environment.getProperty('osa.baseUrl')}/umami/umami.js|}"></script>
+  <title>Parallel Archive</title>
+  <meta name="citation_title" th:if="${publishedDocument.metaData.originalTitle}" th:content="${publishedDocument.metaData.originalTitle}">
+  <meta name="citation_author" th:if="${publishedDocument.metaData.originalAuthor}" th:content="${publishedDocument.metaData.originalAuthor}">
+  <meta name="citation_publication_date" th:if="${publishedDocument.metaData.createdAtYear}" th:content="${publishedDocument.metaData.createdAtYear}">
+</head>
+<body>
+    <main id="publication">
+        <div th:replace="fragments/login.html :: login"></div>
+        <div th:replace="fragments/globalmenu.html :: globalmenu (page=${publishedDocument.metaData.originalTitle}, userMenuData=${userMenuData})"></div>
+        <div class="error-snackbar">
+            <span class="error-snackbar-content"></span>
+            <button id="error-snackbar-close"></button>
+        </div>
+        <div class="collections-modal" id="rename-collection-modal">
+            <div class="collections-modal-body" th:if="${collectionsData != null and not #lists.isEmpty(collectionsData.collections)}">
+                <div class="collections-modal-content">
+                    <form action="#" id="save-to-collection-form">
+                        <div class="collections-modal-header">
+                            <p>Save publication to collection</p>
+                            <div class="text-right">
+                                <button class="button button-ghost-500" id="save-to-collection-cancel">Cancel</button>
+                                <button class="button button-primary-500" id="save-to-collection-submit" disabled>Save</button>
+                            </div>
+                        </div>
+                        <ul class="collections-list">
+                            <li th:each="collection: ${collectionsData.collections}" class="font-weight-light">
+                                <input th:id="@{/privatecollections/{id}(id=${collection.id})}" th:attr="data-id=${collection.id}" type="checkbox" class="radio-like-checkbox"/>
+                                <label th:for="@{/privatecollections/{id}(id=${collection.id})}" th:text="${collection.name}"></label>
+                            </li>
+                        </ul>
+                    </form>
+
+                </div>
+            </div>
+            <div class="collections-modal-body" th:if="${collectionsData != null and #lists.isEmpty(collectionsData.collections)}">
+                <div class="collections-modal-content">
+                    <h2 class="font-weight-light mt-0">Create new collection</h2>
+                    <form action="/privatecollections" method="POST" id="create-collection-form">
+                        <label for="collection-name" class="font-bold">Name</label>
+                        <input type="text" pattern=".*\S+.*" required name="name" id="collection-name">
+                        <input type="hidden" name="publication" id="publication-hash">
+                        <div class="text-right">
+                            <button id="create-collection-cancel" class="mt-1 button button-ghost-500">Cancel</button>
+                            <button id="create-collection-submit" class="mt-1 button button-primary-500">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="content" th:with="currentUrl=(${#httpServletRequest.requestURI})">
+            <div class="wrapper">
+                <div class="top">
+                    <div class="metadata">
+                        <div>
+                            <p>Original Title</p>
+                            <p th:text="${publishedDocument.metaData.originalTitle}"></p>
+                        </div>
+                        <div>
+                            <p>Original Author</p>
+                            <p th:if="${publishedDocument.metaData.originalAuthor}" th:text="${publishedDocument.metaData.originalAuthor}"></p>
+                            <p th:if="${#strings.isEmpty(publishedDocument.metaData.originalAuthor)}"></p>
+                        </div>
+                        <div>
+                            <p>Date Created</p>
+                            <p th:text="${publishedDocument.metaData.createdAtYear}"></p>
+                        </div>
+                        <div>
+                            <p>Type(s)</p>
+                            <div class="list-container">
+                                <span class="list-item" th:each="type: ${publishedDocument.metaData.types}" th:text="${type}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Languages</p>
+                            <div class="list-container">
+                                <span class="list-item" th:each="language: ${publishedDocument.metaData.languages}" th:text="${language}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Period Covered</p>
+                            <p>
+                                <span th:text="${publishedDocument.metaData.periodCoveredFrom}"></span>
+                                <span> - </span>
+                                <span th:text="${publishedDocument.metaData.periodCoveredTo}"></span>
+                            </p>
+                        </div>
+                        <div>
+                            <p>Country(ies) Covered</p>
+                            <div class="list-container">
+                                <span class="list-item" th:each="country: ${publishedDocument.metaData.countriesCovered}" th:text="${country}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Archive Name</p>
+                            <p th:text="${publishedDocument.metaData.archiveName}"></p>
+                        </div>
+                        <div>
+                            <p>Archive Category</p>
+                            <p th:text="${publishedDocument.metaData.archiveCategory}"></p>
+                        </div>
+                        <div>
+                            <p>Publication</p>
+                            <p th:text="${publishedDocument.metaData.publication}"></p>
+                        </div>
+                        <div>
+                            <p>Catalogue URL</p>
+                            <a th:href="${#strings.toLowerCase(publishedDocument.metaData.catalogUrl)}" th:text="${#strings.toLowerCase(publishedDocument.metaData.catalogUrl)}" target="_blank"></a>
+                        </div>
+                        <div>
+                            <p>Reference Code</p>
+                            <p th:text="${publishedDocument.metaData.referenceCode}"></p>
+                        </div>
+                        <div>
+                            <p>Source URL</p>
+                            <a th:href="${#strings.toLowerCase(publishedDocument.metaData.sourceUrl)}" th:text="${#strings.toLowerCase(publishedDocument.metaData.sourceUrl)}" target="_blank"></a>
+                        </div>
+                        <div class="published-info">
+                            <p>Published By</p>
+                            <p th:text="${publishedDocument.userName}"></p>
+                        </div>
+                        <div>
+                            <p>Created At</p>
+                            <p th:text="${publishedDocument.createdAt}"></p>
+                        </div>
+                        <div>
+                            <p>Views</p>
+                            <p th:text="${publishedDocument.views}"></p>
+                        </div>
+                        <div class="publication__tags-section">
+                            <p>Tags</p>
+                            <div class="tags-container">
+                                <a th:each="tag: ${publishedDocument.metaData.tags}"
+                                th:href="@{/(tag=${tag})}" th:text="${tag}" class="publication-info__tag"></a>
+                            </div>
+                        </div>
+                        <div class="publication__ipfs-section" th:if="${not #strings.isEmpty(publishedDocument.ipfsContentId)}">
+                            <p>IPFS Content Identifier</p>
+                            <p th:text="${publishedDocument.ipfsContentId}" class="ipfs-cid"></p>
+                            <a href="/ipfs" target="_blank" class="ipfs-link"></a>
+                        </div>
+                    </div>
+                    <div class="manage-buttons">
+                        <div>
+                            <a class="button button-primary-500 open-pdf umami--click--publication-pdf-download" th:href="${publishedDocument.pdfUrl}" target="_blank">Read PDF</a>
+                            <button sec:authorize="isAuthenticated()" data-modal='collections' class="button button-primary-500" save-to-collection th:attr="data-url=${currentUrl}">Save to Collection</button>
+                            <button sec:authorize="not isAuthenticated()" data-modal='login' class="button button-primary-500" save-to-collection>Save to Collection</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <form sec:authorize="isAuthenticated()" th:action="${currentUrl}" class="publication-annotation" method="post">
+                        <div>
+                            <label for="annotation" class="styled-input-label">Add/Edit comment</label>
+                            <textarea type="text" name="annotation" id="annotation" class="styled-input" row="10" aria-label="Add or edit comment" th:value="${publishedDocument.annotation}" th:text="${publishedDocument.annotation}"></textarea>
+                        </div>
+                        <button sec:authorize="isAuthenticated()" class="button button-primary-500" aria-label="Submit comment" type="submit" data-rel="back">Submit</button>
+                    </form>
+                    <form sec:authorize="not isAuthenticated()" class="publication-annotation" method="post">
+                        <div>
+                            <label for="annotation" class="styled-input-label">Add/Edit comment</label>
+                            <textarea type="text" name="annotation" id="annotation" class="styled-input" row="10" aria-label="Add or edit comment" th:value="${publishedDocument.annotation}" th:text="${publishedDocument.annotation}" disabled></textarea>
+                        </div>
+                        <button sec:authorize="not isAuthenticated()" class="button button-primary-500" aria-label="Submit comment" open-login>Log in</button>
+                    </form>
+                    <div class="ocr-card" th:if="${#arrays.length(publishedDocument.originalOcrs) != 0}">
+                        <input type="checkbox" id="unedited-ocr" checked="true" class="accordion-controller" th:disabled="${#arrays.length(publishedDocument.originalOcrs) == 0}">
+                        <label class="accordion-title" for="unedited-ocr">Read unedited OCR</label>
+                        <div class="ocr-content" th:if="${#arrays.length(publishedDocument.originalOcrs) != 0}">
+                            <p th:each="imageocr: ${publishedDocument.originalOcrs}" th:text="${imageocr}" th:if="null != ${imageocr} and ${#strings.length(imageocr)}"></p>
+                        </div>
+                    </div>
+                    <div class="ocr-card" th:if="${#arrays.length(publishedDocument.editedOcrs) != 0}">
+                        <input type="checkbox" id="edited-ocr" checked="true" class="accordion-controller" th:disabled="${#arrays.length(publishedDocument.editedOcrs) == 0}">
+                        <label class="accordion-title" for="edited-ocr">Read publisher-edited OCR</label>
+                        <div class="ocr-content" th:if="${#arrays.length(publishedDocument.editedOcrs) != 0}">
+                            <p th:each="imageocr: ${publishedDocument.editedOcrs}" th:text="${imageocr}" th:if="null != ${imageocr} and ${#strings.length(imageocr)}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:replace="fragments/globalfooter.html :: globalfooter"></div>
+        </div>
+    </main>
+    <script type="text/javascript" th:src="@{/js/utils.js}"></script>
+    <script type="text/javascript" th:src="@{/js/login.js}"></script>
+    <script type="text/javascript" th:src="@{/js/globalmenu.js}"></script>
+    <script type="text/javascript" th:src="@{/js/publication.js}"></script>
+    <script>
+        (() => {
+
+            document.querySelector("button[open-login]")?.addEventListener("click", e => {
+                e.preventDefault();
+                document.dispatchEvent(new CustomEvent("open-login", {
+                    bubbles: true,
+                    cancelable: true,
+                    detail: {targetUrl: window.location.pathname}
+                }));
+            });
+        })()
+    </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+Hi {{user}}!
+
+Thank you for your registration. Please confirm your registration via this link: {{token}} 

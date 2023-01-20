@@ -1,0 +1,142 @@
+spring:
+  profiles:
+    active: "@activatedProperties@"
+  jpa:
+    properties:
+      hibernate:
+        dialect: "org.hibernate.dialect.MariaDB103Dialect"
+  datasource:
+    url: ${DATASOURCE_URL}
+    driverClassName: org.mariadb.jdbc.Driver
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 30
+  mail:
+    host: ${MAIL_HOST}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          port: 587
+          auth: true
+          starttls: 
+            enabled: true
+            required: true
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB
+  elasticsearch:
+    rest:
+      uris: ${ELASTICSEARCH_REST_URIS}
+      connection-timeout: 1s
+      read-timeout: 1m
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+  jms:
+    template:
+      receive-timeout: 30
+server:
+  servlet:
+    session:
+      timeout: 120m
+osa:
+  baseUrl: ${OSA_BASE_URL}
+  appBaseUrl: ${OSA_APP_BASE_URL}
+  email:
+    from: ${OSA_EMAIL_FROM}
+    name: ${OSA_EMAIL_NAME}  
+  myshoebox:
+    display:
+      size:
+        max: 20
+  documents:
+    display:
+      size:
+        max: 20
+  published-documents:
+    display:
+      size:
+        max: 20
+  ocr:
+    limit: 25
+    upload:
+      batch:
+        limit: 4
+  user:
+    anonymous:
+      id: ${OSA_ANONYMOUS_USER_ID}
+    password:
+      length:
+        min: 7
+  ipfs:
+    url: 
+      upload: ${IPFS_UPLOAD_URL}
+    api-password: ${IPFS_API_PASSWORD}
+  umami:
+    data-website-id: ${UMAMI_DATA_WEBSITE_ID}
+        
+scheduled-tasks:
+  send-emails:
+    initial-delay: 500
+    fixed-delay: PT05M
+  delete-images:
+    initial-delay: 30000
+    fixed-delay: PT06H  
+  publish-documents:
+    generate-ocr:
+      initial-delay: PT01M
+      fixed-delay: PT12S
+    generate-hash:
+      initial-delay: PT02M
+      fixed-delay: PT12S
+    generate-pdf:
+      initial-delay: PT03M
+      fixed-delay: PT12S
+    upload-to-ipfs:
+      initial-delay: PT04M
+      fixed-delay: PT12S
+    create-pdf-thumbnail:
+      initial-delay: PT05M
+      fixed-delay: PT12S
+    delete-original-document:
+      initial-delay: PT06M
+      fixed-delay: PT12S
+    index-published-document:
+      initial-delay: PT07M
+      fixed-delay: PT12S
+    publish-document:
+      initial-delay: PT08M
+      fixed-delay: PT12S
+     
+jsa:
+  aws:
+    access_key_id: ${AWS_ACCESS_KEY}
+    secret_access_key: ${AWS_SECRET_KEY}
+  s3: 
+    region: ${AWS_S3_REGION}
+    bucket: ${AWS_S3_BUCKET}
+
+management:
+  security:
+      enabled: false
+  port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    metrics: 
+      enabled: true
+    
+thumbnailator:
+  conserveMemoryWorkaround: true 
+
+#local:
+#  fastPublicArchivesQuery: true
+
+

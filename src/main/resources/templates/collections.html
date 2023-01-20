@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap"
+        rel="stylesheet">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/general.css}" />
+    <link rel="stylesheet" th:href="@{/css/accountforms.css}" />
+    <link rel="stylesheet" th:href="@{/css/globalmenu.css}" />
+    <link rel="stylesheet" th:href="@{/css/publicarchive.css}" />
+    <link rel="stylesheet" th:href="@{/css/collections.css}" />
+    <link rel="stylesheet" th:href="@{/css/accordion.css}" />
+    <script async defer th:data-website-id="${@environment.getProperty('osa.umami.data-website-id')}"
+        th:src="@{|${@environment.getProperty('osa.baseUrl')}/umami/umami.js|}"></script>
+    <title>Parallel Archive</title>
+</head>
+
+<body>
+    <main class="main" id="collections">
+        <div class="error-snackbar">
+            <span class="error-snackbar-content"></span>
+            <button id="error-snackbar-close"></button>
+        </div>
+        <form id="collections" method="get">
+            <div th:replace="fragments/globalmenu.html :: globalmenu (page='Private Collections', userMenuData=${userMenuData})"></div>
+            <div class="content collections-content">
+                <div class="mobile-subheader">
+                    <button th:if="${collectionData != null && collectionData.id != null}"
+                        class="delete-from-collection button" disabled>Delete from collection</button>
+                        <button add-collection-button
+                        class="button">
+                        New collection
+                            <img class="button-icon" src="/css/plus-red.svg">
+                        </button>
+                </div>
+                <div class="accordion collections-accordion">
+                    <label class="accordion-title" for="collection-accordion">Select Collection</label>
+                    <input type="checkbox" class="accordion-controller" id="collection-accordion"/>
+                    <ul class="collections-list options-container">
+                        <li class="my-uploaded-documents accordion-option" th:classappend="${collectionData == null ? 'active' : ''}">
+                            <a href="/privatecollections/mydocuments">My Published Documents</a><span
+                                th:text="${collectionsData.collections[0].collectionSize}"></span>
+                        </li>
+                        <li th:if="${collection.name}"
+                            class="accordion-option"
+                            th:classappend="${collectionData != null && collectionData.id == collection.id ? 'active' : ''}"
+                            th:each="collection: ${collectionsData.collections}" th:attr="data-id=${collection.id}">
+                            <a th:href="@{/privatecollections/{id}(id=${collection.id})}" th:text="${collection.name}"></a>
+                            <span th:text="${collection.collectionSize}"></span>
+                            <a href="#" th:attr="data-id=${collection.id},data-name=${collection.name}"
+                                onclick="renameCollection(event)"><img width="15" src="/css/pencil.svg"
+                                    alt="rename collection"></a>
+                            <a href="#" th:attr="data-id=${collection.id},data-name=${collection.name}"
+                                onclick="deleteCollection(event)"><img width="12" src="/css/trash.svg"
+                                    alt="delete collection"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collections-sort-row collections-sort-desktop">
+                    <div class="options collections-sort">
+                        <select name="sort" id="sort" sortby="">
+                            <option
+                                th:selected="${param.sort != null and param.sort[0] == 'DESC' and param.sortBy != null and param.sortBy[0] == 'DATE'}"
+                                value="DESC" sortby="DATE">Recently
+                                published first</option>
+                            <option
+                                th:selected="${param.sort != null and param.sort[0] == 'ASC' and param.sortBy != null and param.sortBy[0] == 'DATE'}"
+                                value="ASC" sortby="DATE">Recently
+                                published last</option>
+                            <option
+                                th:selected="${param.sort != null and param.sort[0] == 'DESC' and param.sortBy != null and param.sortBy[0] == 'VIEWS'}"
+                                value="DESC" sortby="VIEWS">Number of views descending</option>
+                            <option
+                                th:selected="${param.sort != null and param.sort[0] == 'ASC' and param.sortBy != null and param.sortBy[0] == 'VIEWS'}"
+                                value="ASC" sortby="VIEWS">Number of views ascending</option>
+                            <option
+                                th:selected="${param.sort != null and param.sort[0] == 'DESC' and param.sortBy != null and param.sortBy[0] == 'TITLE'}"
+                                value="DESC" sortby="TITLE">Alphabetically descending</option>
+                            <option
+                                th:selected="${param.sort != null and param.sort[0] == 'ASC' and param.sortBy != null and param.sortBy[0] == 'TITLE'}"
+                                value="ASC" sortby="TITLE">Alphabetically ascending</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="action-buttons fancy-scroll">
+                    <div class="collections-leftnav-header">
+                        <button add-collection-button
+                            class="collections-leftnav-header-button button button-ghost-500">
+                            New collection
+                            <img class="button-icon" src="/css/plus-red.svg">
+                        </button>
+                    </div>
+                    <button th:if="${collectionData != null && collectionData.id != null}"
+                        class="delete-from-collection button button-ghost-500" disabled>Delete from collection
+                    </button>
+
+                    <ul class="collections-list">
+                        <li class="my-uploaded-documents" th:classappend="${collectionData == null ? 'active' : ''}">
+                            <a href="/privatecollections/mydocuments">My Published Documents</a><span
+                                th:text="${collectionsData.collections[0].collectionSize}"></span>
+                        </li>
+                        <li th:if="${collection.name}"
+                            th:classappend="${collectionData != null && collectionData.id == collection.id ? 'active' : ''}"
+                            th:each="collection: ${collectionsData.collections}" th:attr="data-id=${collection.id}">
+                            <a th:href="@{/privatecollections/{id}(id=${collection.id})}" th:text="${collection.name}"></a>
+                            <span th:text="${collection.collectionSize}"></span>
+                            <a href="#" th:attr="data-id=${collection.id},data-name=${collection.name}"
+                                onclick="renameCollection(event)"><img width="15" src="/css/pencil.svg"
+                                    alt="rename collection"></a>
+                            <a href="#" th:attr="data-id=${collection.id},data-name=${collection.name}"
+                                onclick="deleteCollection(event)"><img width="12" src="/css/trash.svg"
+                                    alt="delete collection"></a>
+                        </li>
+                    </ul>
+                </div>
+
+
+
+                <div class="publication-grid">
+                    <div class="no-results" th:if="${collectionDocuments.documents.numberOfElements < 1}">It seems like
+                        you have not yet added publications to this collection.</div>
+                    <div class="publication-card" th:each="publication: ${collectionDocuments.documents.content}">
+                        <a th:href="${publication.url}" class="publication-link">
+                            <div class="publication-image-container">
+                                <img width="130" th:src="${publication.thumbnailUrl}">
+                            </div>
+                        </a>
+                        <div class="publication-info">
+                            <a th:href="${publication.url}" class="publication-link-wrapper">
+                                <div class="publication-info__original-title-section">
+                                    <p class="publication-info__original-title"
+                                        th:text="${publication.metaData.originalTitle}"></p>
+                                </div>
+                                <div class="publication-info__date-created-section">
+                                    <div th:if="${#arrays.length(publication.metaData.languages) <= 2}">
+                                        <span class="publication-info__language"
+                                            th:each="language: ${publication.metaData.languages}"
+                                            th:text="${language}"></span>
+                                    </div>
+                                    <div th:if="${#arrays.length(publication.metaData.languages) > 2}">
+                                        <span class="publication-info__language"
+                                            th:text="${publication.metaData.languages[0]}"
+                                            th:if="${publication.metaData.languages[0]}"></span>
+                                        <span class="publication-info__language"
+                                            th:text="${publication.metaData.languages[1]}"
+                                            th:if="${publication.metaData.languages[1]}"></span>
+                                        <span class="publication-info__language"
+                                            th:if="${#arrays.length(publication.metaData.languages) - 2 > 0}"
+                                            th:text="'+' + ${#arrays.length(publication.metaData.languages) - 2} + ' more'"></span>
+                                    </div>
+                                    <div>
+                                        <span class="label">Date Created:</span>
+                                        <span class="publication-info__date-created"
+                                            th:text="${publication.metaData.createdAtYear}"></span>
+                                    </div>
+                                    <div class="publication-info__views">
+                                        <span class="label">Views:</span>
+                                        <span class="publication-info__views-number"
+                                            th:text="${publication.views}"></span>
+                                    </div>
+                                </div>
+                                <div class="publication-info__source-url-section">
+                                    <span class="label">Source:</span>
+                                    <span class="publication-info__date-created"
+                                        th:text="${publication.metaData.sourceUrl}"></span>
+                                </div>
+                                <div class="publication-info__published-by">
+                                    <span class="label">Published by:</span>
+                                    <div class="flex">
+                                        <span class="publication-info__published-by-person"
+                                            th:text="${publication.userName}"></span>
+                                        <span class="publication-info__published-by-date"
+                                            th:text="${publication.createdAt}"></span>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="publication-info__tags-section">
+                                <span class="label">Top Tags:</span>
+                                <div>
+                                    <a th:each="tag: ${publication.metaData.tags}"
+                                        th:href="@{/(tag=${tag})}" th:text="${tag}"
+                                        class="publication-info__tag"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <label th:if="${collectionData != null && collectionData.id != null}" class="select-checkbox">
+                            <input type="checkbox" class="select-publication radio-like-checkbox" name="" value=""
+                                th:attr="data-id=${publication.hash}" />
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div
+                th:replace="fragments/document-pagination.html :: pagination(documents=${collectionDocuments.documents})">
+            </div>
+            <div th:replace="fragments/globalfooter.html :: globalfooter"></div>
+        </form>
+        <div class="collections-modal" id="add-collection-modal">
+            <div class="collections-modal-body">
+                <div class="collections-modal-content">
+                    <form action="/privatecollections" method="POST">
+                        <div class="collections-modal-header">
+                            <p>Create new collection</p>
+                            <div class="text-right">
+                                <button class="button button-ghost-500" id="add-collection-cancel">Cancel</button>
+                                <button class="button button-primary-500" create-collection>Save</button>
+                            </div>
+                        </div>
+                        <label class="styled-input-label" for="collection-name">Name</label>
+                        <input class="styled-input" type="text" pattern=".*\S+.*" required name="name"
+                            id="collection-name">
+                        <input type="hidden" name="publication" id="publication-hash" value="">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="collections-modal" id="delete-collection-modal">
+            <div class="collections-modal-body">
+                <div class="collections-modal-content">
+                    <form action="">
+                        <div class="collections-modal-header">
+                            <p>Delete collection</p>
+                            <div class="text-right">
+                                <button id="delete-collection-cancel" class="button button-ghost-500">Cancel</button>
+                                <button class="button button-primary-500">Delete</button>
+                            </div>
+                        </div>
+                        <p to-delete-name>Name</p>
+                </div>
+                </form>
+            </div>
+        </div>
+        </div>
+        <div class="collections-modal" id="rename-collection-modal">
+            <div class="collections-modal-body">
+                <div class="collections-modal-content">
+                    <form action="">
+                        <div class="collections-modal-header">
+                            <p>Rename collection</p>
+                            <div class="text-right">
+                                <button class="button button-ghost-500" id="rename-collection-cancel">Cancel</button>
+                                <button class="button button-primary-500" rename-collection>Save</button>
+                            </div>
+                        </div>
+                        <label class="styled-input-label" for="collection-name">Name</label>
+                        <input class="styled-input" type="text" pattern=".*\S+.*" required name="name"
+                            id="collection-name" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="collections-modal" id="delete-from-collection-modal">
+            <div class="collections-modal-body">
+                <div class="collections-modal-content">
+                    <form action="">
+                        <div class="collections-modal-header">
+                            <p>Delete publication from this collection</p>
+                            <div class="text-right">
+                                <button id="delete-from-collection-cancel"
+                                class="button button-ghost-500">Cancel</button>
+                                <button class="button button-primary-500 delete-from-collection-confirm">Delete</button>
+                            </div>
+                        </div>
+                        <p class="publication-name"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="collections-modal" id="collection-list-modal">
+            <div class="collections-modal-body">
+                <div class="collections-modal-content">
+                    <h2 class="font-weight-light mt-0">Collections</h2>
+                    <form action="">
+                        <ul class="collections-list-in-modal">
+                            <li class="my-uploaded-documents"
+                                th:classappend="${collectionData == null ? 'active' : ''}">
+                                <a href="/privatecollections/mydocuments">My Published Documents</a><span
+                                    th:text="${collectionsData.collections[0].collectionSize}"></span>
+                            </li>
+                            <li th:if="${collection.name}"
+                                th:classappend="${collectionData != null && collectionData.id == collection.id ? 'active' : ''}"
+                                th:each="collection: ${collectionsData.collections}" th:attr="data-id=${collection.id}">
+                                <a th:href="@{/privatecollections/{id}(id=${collection.id})}" th:text="${collection.name}"></a>
+                                <span th:text="${collection.collectionSize}"></span>
+                                <a href="#" th:attr="data-id=${collection.id},data-name=${collection.name}"
+                                    onclick="renameCollection(event)"><img width="18" src="/css/pencil.svg"
+                                        alt="rename collection"></a>
+                                <a href="#" th:attr="data-id=${collection.id},data-name=${collection.name}"
+                                    onclick="deleteCollection(event)"><img width="20" src="/css/trash.svg"
+                                        alt="delete collection"></a>
+                            </li>
+                            </ui>
+                            <button id="collection-list-modal-close"
+                                class="mt-1 button button-ghost-500 w-100">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script type="text/javascript" th:src="@{/js/globalmenu.js}"></script>
+    <script type="text/javascript" th:src="@{/js/utils.js}"></script>
+    <script>
+        (() => {
+            const errorSnackbar = document.querySelector(".error-snackbar");
+            const errorSnackbarContent = document.querySelector(".error-snackbar-content");
+            const errorSnackbarClose = document.getElementById("error-snackbar-close");
+
+
+            const openErrorSnackbar = (message) => {
+                errorSnackbar.classList.add("active");
+                this.timeout = window.setTimeout(() => {
+                    errorSnackbar.classList.remove("active");
+                }, 3000);
+                errorSnackbarContent.textContent = message;
+                errorSnackbarClose.addEventListener("click", () => {
+                    errorSnackbar.classList.remove("active");
+                })
+            }
+
+            const sort = document.querySelector("select")
+            const form = document.querySelector("form#collections");
+            const selectedCollectionId = document.querySelector("li.active").getAttribute("data-id") || "mydocuments";
+            form.setAttribute("action", `/privatecollections/${selectedCollectionId}`)
+            sort.addEventListener("change", e => {
+                e.preventDefault();
+                window.location.href = `/privatecollections/${selectedCollectionId}?sort=${sort.selectedOptions[0].getAttribute("value")}&sortBy=${sort.selectedOptions[0].getAttribute("sortby")}`;
+            })
+
+            const addModal = document.getElementById('add-collection-modal');
+
+            document.getElementById('add-collection-cancel')?.addEventListener('click', e => {
+                e.preventDefault()
+                addModal.classList.remove('active');
+                document.body.removeAttribute("data-overlay-open");
+            })
+            document.querySelectorAll('[add-collection-button]').forEach(b => {
+                b.addEventListener('click', e => {
+                    e.preventDefault();
+                    addModal.classList.add('active');
+                    document.body.setAttribute("data-overlay-open", "data-overlay-open");
+                    addModal.querySelector('input').focus();
+                    const createCollectionForm = document.querySelector("#create-collection-form");
+                    const publicationHashInput = document.querySelector("#publication-hash");
+                    if(!publicationHash) {
+                        publicationHashInput.remove();
+                    } else {
+                        publicationHashInput.value = publicationHash;
+                    }
+                    document?.addEventListener("keydown", e => {
+                        addOnEnter(e, document.querySelector("[create-collection]"));
+                    });
+                });
+            });
+
+            function addOnEnter(e, target) {
+                if (e.code === "Enter") {
+                    target.click();
+                    document?.removeEventListener("keydown", addOnEnter);
+                }
+            }
+
+            const deleteModal = document.getElementById('delete-collection-modal')
+            document.getElementById('delete-collection-cancel').addEventListener('click', e => {
+                e.preventDefault();
+                deleteModal.classList.remove('active');
+                document.body.removeAttribute("data-overlay-open");
+            })
+
+            const deleteCollection = e => {
+                e.preventDefault()
+                document.querySelectorAll(".collections-modal").forEach(m => m.classList.remove("active"));
+                deleteModal.classList.add('active')
+                document.body.setAttribute("data-overlay-open", "data-overlay-open");
+                deleteModal.querySelector('button').focus()
+                deleteModal.querySelector('form').dataset.collectionId = e.currentTarget.dataset.id;
+                deleteModal.querySelector('[to-delete-name]').innerText = e.currentTarget.dataset.name
+            }
+            deleteModal.querySelector('form').addEventListener('submit', e => {
+                e.preventDefault()
+                fetch(`/api/collection/${e.currentTarget.dataset.collectionId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
+                    .then(d => {
+                        responseInterceptor(d);
+                        if (d.status === 200) {
+                            openErrorSnackbar("Deleted collection.");
+                            window.location.href = '/privatecollections/mydocuments';
+                        } else {
+                            openErrorSnackbar("Could not delete collection.");
+                            deleteModal.classList.remove('active');
+                            document.body.removeAttribute("data-overlay-open");
+                        }
+                    })
+            })
+            window.deleteCollection = deleteCollection
+
+            const renameModal = document.getElementById('rename-collection-modal')
+            document.getElementById('rename-collection-cancel').addEventListener('click', e => {
+                e.preventDefault()
+                renameModal.classList.remove('active');
+                document.body.removeAttribute("data-overlay-open");
+            })
+
+            const renameCollection = e => {
+                e.preventDefault()
+                document.querySelectorAll(".collections-modal").forEach(m => m.classList.remove("active"));
+                renameModal.classList.add('active')
+                document.body.setAttribute("data-overlay-open", "data-overlay-open");
+                renameModal.querySelector('button').focus()
+                renameModal.querySelector('form').dataset.collectionId = e.currentTarget.dataset.id
+                renameModal.querySelector('#collection-name').value = e.currentTarget.dataset.name
+                renameModal.querySelector('#collection-name').dataset.name = e.currentTarget.dataset.name
+                document?.addEventListener("keydown", e => {
+                    addOnEnter(e, document.querySelector("[rename-collection]"));
+                });
+            }
+            renameModal.querySelector('form').addEventListener('submit', e => {
+                e.preventDefault(e.currentTarget.dataset.name)
+                fetch(`/api/collection`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: e.currentTarget.dataset.collectionId, name: renameModal.querySelector('#collection-name').value }) })
+                    .then(d => {
+                        responseInterceptor(d);
+                        if (d.status === 200) {
+                            openErrorSnackbar("Collection renamed.");
+                            window.location.href = '/privatecollections/mydocuments';
+                        } else {
+                            openErrorSnackbar("Could not rename collection.");
+                            renameModal.classList.remove('active');
+                            document.body.removeAttribute("data-overlay-open");
+                        }
+                    })
+            })
+            window.renameCollection = renameCollection
+
+            const deleteFromCollectionButtons = document.querySelectorAll(".delete-from-collection");
+            let checkedPublication;
+            let publicationHash;
+            let publicationCheckboxes = document.querySelectorAll("input.select-publication");
+            document.addEventListener("change", e => {
+                if (e.target.matches("input.select-publication") && e.target.checked) {
+                    deleteFromCollectionButtons.forEach(b => {
+                        b.classList.add("active");
+                        b.removeAttribute("disabled");
+                    });
+                    checkedPublication = e.target;
+                    publicationHash = e.target.getAttribute("data-id");
+
+                    publicationCheckboxes.forEach(cb => {
+                        if (cb != e.target) {
+                            cb.checked = false;
+                        }
+                    })
+                } else {
+                    deleteFromCollectionButtons.forEach(b => {
+                        b.classList.remove("active");
+                        b.setAttribute("disabled", "disabled");
+                    });
+                    document.body.removeAttribute("data-overlay-open");
+                    checkedPublication = null;
+                }
+            });
+
+            window.onload = () => {
+                let cbinput;
+                if(Array.from(publicationCheckboxes).some(input => {
+                    if(input.checked) {
+                        cbinput = input;
+                        return true
+                    }
+                })) {
+                    checkedPublication = cbinput;
+                    publicationHash = cbinput.getAttribute("data-id");
+
+                    deleteFromCollectionButtons.forEach(b => {
+                        if(!b.classList.contains("active")) {
+                            b.classList.add("active");
+                            b.removeAttribute("disabled");
+                        }
+                    });
+                }
+            }
+
+            const deleteFromCollectionModal = document.getElementById("delete-from-collection-modal");
+
+            deleteFromCollectionButtons.forEach(b => {
+                b.addEventListener("click", e => {
+                    e.preventDefault();
+                    const deleteConfirmButton = document.querySelector(".delete-from-collection-confirm");
+
+                    deleteFromCollectionModal.classList.add("active");
+                    document.body.setAttribute("data-overlay-open", "data-overlay-open");
+                    deleteConfirmButton.focus();
+
+                    let collectionId = document.querySelector(".collections-list li.active").getAttribute("data-id");
+
+                    deleteFromCollectionModal.querySelector(".publication-name").textContent = checkedPublication?.closest(".publication-card").querySelector(".publication-info__original-title").textContent;
+
+                        deleteConfirmButton.addEventListener("click", e => {
+                            e.preventDefault();
+
+                            fetch(`/api/collection/${collectionId}/publication/${publicationHash}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
+                                .then(d => {
+                                    responseInterceptor(d);
+                                    if (d.status === 200) {
+                                        openErrorSnackbar("Deleted publication from collection.");
+                                        location.reload();
+                                    } else {
+                                        openErrorSnackbar("Could not delete publication from collection.");
+                                        deleteFromCollectionButtons.classList.remove('active')
+                                        document.body.removeAttribute("data-overlay-open");
+
+                                    }
+                                })
+                        })
+
+                    document.getElementById('delete-from-collection-cancel').addEventListener('click', e => {
+                        e.preventDefault();
+                        deleteFromCollectionModal.classList.remove('active');
+                        deleteFromCollectionModal.querySelector(".publication-name").textContent = "";
+                        document.body.removeAttribute("data-overlay-open");
+                    })
+                })
+            });
+
+            const collectionsListModal = document.getElementById("collection-list-modal");
+            const collectionName = document.querySelector(".collections-list li.active a").textContent;
+            const openCollectionsModalButton = document.querySelector("#open-collection-modal");
+            if (openCollectionsModalButton) {
+                openCollectionsModalButton.textContent = collectionName;
+                openCollectionsModalButton.addEventListener("click", e => {
+                    e.preventDefault();
+                    collectionsListModal.classList.add("active");
+                    document.body.setAttribute("data-overlay-open", "data-overlay-open");
+                });
+            }
+            const closeCollectionsListModal = document.getElementById("collection-list-modal-close")
+            closeCollectionsListModal.addEventListener("click", e => {
+                e.preventDefault();
+                collectionsListModal.classList.remove("active");
+                document.body.removeAttribute("data-overlay-open");
+            })
+
+            const accordionTitle = document.querySelector('[for="collection-accordion"]');
+            const selectedCollectionName = document.querySelector(".collections-accordion .collections-list").querySelector("li.active a").textContent;
+            accordionTitle.textContent = selectedCollectionName;
+
+            const pollEndpoint = async() => {
+                const resp = await fetch("/api/publish/inprogress").then(resp => resp.json());
+                return resp.publishInProgress;
+            }
+
+            const poll = async () => {
+                const publishInProgress = await pollEndpoint();
+                if(publishInProgress) {
+                    this.timeOutId = setTimeout(poll, 12000);
+                } else {
+                    if(this.timeOutId) {
+                        clearTimeout(this.timeOutId);
+                        window.location.reload();
+                    }
+                }
+            }
+            const params = new Proxy(new URLSearchParams(window.location.search), {
+                get: (searchParams, prop) => searchParams.get(prop)
+            });
+            let publishing = params.publishing;
+            if(publishing === "true") {
+                poll();
+            }
+        })()
+    </script>
+</body>
+
+</html>

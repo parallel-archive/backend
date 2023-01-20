@@ -1,0 +1,75 @@
+#account hr {
+    width: 90%;
+    border:none;
+    border-bottom: 1px solid lightgrey;
+}
+
+@media (min-width:1024px){
+    #account hr {
+        width: 50%;
+    }
+}
+
+.section {
+    flex-direction: column;
+    padding: 2rem 0;
+}
+
+.section h2 {
+    align-self: center;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    max-width: 100%;
+    color: var(--color-primary);
+}
+
+.section .button {
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+}
+
+@media(min-width: 416px) {
+    .section {
+        padding: 3rem;
+    }
+    .section .button {
+        width: 300px;
+    }
+}
+
+.section a {
+    text-decoration: none;
+}
+
+.loading {
+    display: flex;
+    height: 5rem;
+    margin: 0 auto;
+    width: 5rem;
+    transform: none;
+}
+
+.loading:after {
+    content: " ";
+    display: block;
+    width: 4rem;
+    height: 4rem;
+    margin: .5rem;
+    border-radius: 50%;
+    border: .2rem solid var(--color-primary);
+    border-color: var(--color-primary) transparent;
+    animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform:rotate(360deg);
+    }
+}
+
+.error-container {
+    color: var(--color-error);
+}

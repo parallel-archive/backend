@@ -1,0 +1,56 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  mail:
+    host: test
+    username: test
+    password: test
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          port: 587
+          auth: true
+          starttls: 
+            enabled: true
+            required: true
+  elasticsearch:
+    rest:
+      uris: localhost:9200
+      connection-timeout: 1s
+      read-timeout: 1m
+
+osa:
+  baseUrl: osa.codeandsoda.hu
+  appBaseUrl: app.osa.codeandsoda.hu
+  email:
+    from: noemi.kecskes@codeandsoda.com
+    name: OSA
+  ipfs:
+    url: 
+      upload: test
+    api-password: test  
+  umami:
+    data-website-id: test  
+  user:
+    anonymous:
+      id: 64 
+      
+jsa:
+  aws:
+    access_key_id: test
+    secret_access_key: test
+  s3: 
+    region: eu-west-1
+    bucket: test
+  

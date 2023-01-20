@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/general.css}"/>
+    <link rel="stylesheet" th:href="@{/css/accountforms.css}" />
+    <link rel="stylesheet" th:href="@{/css/globalmenu.css}"/>
+    <script async defer th:data-website-id="${@environment.getProperty('osa.umami.data-website-id')}" th:src="@{|${@environment.getProperty('osa.baseUrl')}/umami/umami.js|}"></script>
+    <title>Parallel Archive</title>
+</head>
+<body>
+    <main id="ipfs">
+        <div th:replace="fragments/login.html :: login"></div>
+        <div th:replace="fragments/globalmenu.html :: globalmenu (page='IPFS', userMenuData=${userMenuData})"></div>
+        <div class="content" id="ipfs-content">
+            <h1>What is IPFS?</h1>
+            <p>IPFS is a distributed system for storing and accessing files, websites, applications, and data.</p>
+            <p><b>Decentralization</b> makes it possible to download a file from many locations that aren't managed by one organization:</p>
+            <ul>
+                <li>Supports a resilient internet. Since data storage is decentralized and distributed, if someone attacks a traditional web server or a big mistake causes the server to catch fire, the stored data can still be retrieved from other sources.
+                </li>
+                <li>Makes it harder to censor content. Because files on IPFS can come from many places, it's harder for anyone (whether they're states, corporations, or someone else) to block things.</li>
+                <li>Can speed up the web when you're far away or disconnected. If you can retrieve a file from someone nearby instead of hundreds or thousands of miles away, you can often get it faster. This is especially valuable if your community is networked locally but doesn't have a good connection to the wider internet. (Well-funded organizations with technical expertise do this today by using multiple data centers or CDNs — content distribution networks (opens new window). IPFS hopes to make this possible for everyone.)</li>
+            </ul>
+
+            <h3>What is the IPFS Content Identifier?</h3>
+            <p>A content identifier, or CID, is a label used to point to material in IPFS. It doesn't indicate where the content is stored, but it forms a kind of address based on the content itself. CIDs are short, regardless of the size of their underlying content.</p>
+
+            <p> CIDs are based on the content’s cryptographic hash. That means:</p>
+            <ul>
+                <li>Any difference in the content will produce a different CID and</li>
+                <li>The same content added to two different IPFS nodes using the same settings will produce the same CID.</li>
+            </ul>
+            <p>IPFS uses the sha-256 hashing algorithm by default.</p>
+            <h4>You may check a document's authenticity by its hash using one of the Gateway checkers listed on the below website.</h4>
+            <pre><a href="https://ipfs.github.io/public-gateway-checker/" target="_blank">https://ipfs.github.io/public-gateway-checker/</a></pre>
+
+            <p>Follow the rule:</p>
+            <pre>https://{gateway URL}/ipfs/{content ID}</pre>
+            <p>where <i>gateway URL</i> is an url picked from the gateway checker list, <i>content ID</i> is the IPFS Content Identifier you may find on a public document page.</p>
+
+            <p>To learn more about <b>IPFS</b>, visit <a href="https://docs.ipfs.io/">https://docs.ipfs.io/</a></p>
+        </div>
+        <div th:replace="fragments/globalfooter.html :: globalfooter"></div>
+    </main>
+    <script type="text/javascript" th:src="@{/js/login.js}"></script>
+    <script type="text/javascript" th:src="@{/js/globalmenu.js}"></script>
+</body>
+</html>

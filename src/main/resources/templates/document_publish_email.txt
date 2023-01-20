@@ -1,0 +1,3 @@
+Hi {{user}}!
+
+Your document was published successfully. You can see its details via this link: {{url}} 

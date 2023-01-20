@@ -1,0 +1,43 @@
+image: maven:3.6.1
+
+pipelines:
+  branches:
+    develop:
+      - step: 
+          name: Build codeandsoda osa-backend project 
+          caches:
+            - maven
+          script: 
+            - export APPVERSION="$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)"
+            - mvn -B package -DskipTests war:war
+          artifacts: 
+            - target/*.war  
+      - step: 
+          name: Deploy codeandsoda osa-backend project
+          deployment: staging
+          script: 
+            - export APPVERSION="$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)"
+            - scp -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null target/osa-backend-$APPVERSION-$BITBUCKET_BRANCH-$BITBUCKET_BUILD_NUMBER.war ubuntu@$OSA_EC2:/home/ubuntu/webapp
+            - ssh -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null ubuntu@$OSA_EC2 -t sudo mv /home/ubuntu/webapp/osa-backend-$APPVERSION-$BITBUCKET_BRANCH-$BITBUCKET_BUILD_NUMBER.war /opt/tomcat/latest/webapps/ROOT.war
+            - ssh -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null ubuntu@$OSA_EC2 -t sudo rm -rf /opt/tomcat/latest/webapps/ROOT/
+            - ssh -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null ubuntu@$OSA_EC2 -t sudo service tomcat restart
+    master:
+      - step: 
+          name: Build codeandsoda osa-backend project 
+          caches:
+            - maven
+          script: 
+            - export APPVERSION="$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)"
+            - mvn -B package -DskipTests war:war
+          artifacts: 
+            - target/*.war  
+      - step: 
+          name: Deploy codeandsoda osa-backend project
+          deployment: production
+          script: 
+            - export APPVERSION="$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)"
+            - scp -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null target/osa-backend-$APPVERSION-$BITBUCKET_BRANCH-$BITBUCKET_BUILD_NUMBER.war ubuntu@$OSA_EC2_PROD:/home/ubuntu/webapp
+            - ssh -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null ubuntu@$OSA_EC2_PROD -t sudo mv /home/ubuntu/webapp/osa-backend-$APPVERSION-$BITBUCKET_BRANCH-$BITBUCKET_BUILD_NUMBER.war /opt/tomcat/latest/webapps/ROOT.war
+            - ssh -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null ubuntu@$OSA_EC2_PROD -t sudo rm -rf /opt/tomcat/latest/webapps/ROOT/
+            - ssh -oStrictHostKeyChecking=no -oCheckHostIP=no -oUserKnownHostsFile=/dev/null ubuntu@$OSA_EC2_PROD -t sudo service tomcat restart
+            

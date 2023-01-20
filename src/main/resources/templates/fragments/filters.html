@@ -1,0 +1,57 @@
+<div class="leftnav">
+    <div class="modal-header"><span class="close"></span></div>
+    <div class="options" th:fragment="options">
+        <input type="hidden" name="sort" value="">
+        <input type="hidden" name="sortBy" value="">
+    </div>
+    <div class="filters" th:fragment="filters(filters)">
+        <input type="checkbox" id="filter-title" checked="true">
+        <label class="filter-title" data-open="data-open" for="filter-title">Filter publications</label>
+        <div class="filtergroup" group-open="group-open" period-filters>
+            <div class="accordion">
+                <input type="checkbox" class="accordion-controller" id="periodfilter"/>
+                <label class="accordion-title" for="periodfilter">Period</label>
+                <div class="options-container">
+                    <div class="accordion-option">
+                        <label th:for="periodFrom">Period from</label>
+                        <input type="number" th:name="periodFrom" th:id="periodFrom" th:value="${documentFilterTypesData.periodFilter.from}" min="0" class="styled-input">
+                    </div>
+                    <div class="accordion-option">
+                        <label th:for="periodTo">Period to</label>
+                        <input type="number" th:name="periodTo" th:id="periodTo" th:value="${documentFilterTypesData.periodFilter.to}" th:max="${documentFilterTypesData.periodFilter.to}" class="styled-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="filtergroup" group-open="group-open">
+            <div th:each="entry: ${filters}">
+                <div class="accordion">
+                    <input type="checkbox" class="accordion-controller" th:id="${entry.id}"/>
+                    <label class="accordion-title" th:text="${entry.name.displayName}" th:for="${entry.id}"></label>
+                    <div class="options-container">
+                        <div class="accordion-option" th:each="filter: ${entry.filters}">
+                            <label th:text="${filter.name.displayName}" th:for="${filter.name.name}"></label>
+                            <input type="checkbox" th:name="${#strings.toLowerCase(entry.name)}" th:checked="${filter.active}" th:value="${filter.name.name}" th:id="${filter.name.name}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="filtergroup" group-open="group-open" tag-filters th:if=${#arrays.length(documentFilterTypesData.tags)}>
+            <div class="accordion">
+                <input type="checkbox" class="accordion-controller" id="tagfilter"/>
+                <label class="accordion-title" for="tagfilter">Tags</label>
+                <div class="options-container">
+                    <div class="accordion-option" th:each="tag: ${documentFilterTypesData.tags}">
+                        <div th:with="currentUrl=(${#httpServletRequest.requestURI + '?' + #strings.defaultString(#httpServletRequest.queryString, '')})">
+                            <a th:href="@{${currentUrl}(tag=${tag})}" th:text=${tag}></a>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="button button-ghost-500" apply-filters-button form="publicarchive" type="submit">Apply filters
+            <img class="button-icon" src="/css/plus-red.svg">
+        </button>
+    </div>
+</div>

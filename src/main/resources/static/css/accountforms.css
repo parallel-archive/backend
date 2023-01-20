@@ -1,0 +1,204 @@
+body {
+    background-color: var(--color-grey-lightest);
+}
+
+h1 {
+    color: var(--color-primary);
+    font-size: 1.7rem;
+    text-align: left;
+}
+
+@media(min-width: 1024px) {
+    #login > div {
+        width: 23%;
+    }
+}
+
+form,
+.container {
+    margin: 0 auto;
+}
+
+label {
+    display: block;
+    margin-bottom: .2rem;
+}
+
+input {
+    display:block;
+    margin: 0 0 1rem 0;
+    padding: 5px;
+    width: 100%;
+}
+
+input, textarea {
+    font-family:inherit;
+    font-size: inherit;
+}
+
+input[type="submit"] {
+    cursor: pointer;
+    font-size: inherit;
+    margin: 1rem 0;
+}
+
+button[type="submit"] {
+    cursor: pointer;
+    display: flex;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+}
+
+label.styled-input-label {
+    background: transparent;
+    box-sizing: border-box;
+    color: var(--color-grey);
+    display: inline-block;
+    font-size: var(--font-size-small);
+    width: fit-content;
+}
+
+input.styled-input:hover, 
+input.styled-input:focus, 
+input.styled-input:active {
+    background-color: transparent;
+}
+
+input.styled-input {
+    background-color: transparent;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    margin-bottom: 10px;
+    padding: 0.8rem 1rem;
+}
+
+input.styled-input:active,
+input.styled-input:focus {
+    margin-bottom: 10px;
+    outline: none;
+}
+
+.forgot-password-form label {
+    font-size: var(--font-size-medium);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.login-form .register {
+    margin-bottom: 0.5rem;
+}
+.login-form label:first-of-type,
+.change-password-form label:first-of-type {
+    margin-top: 0;
+}
+
+.login-form label,
+.change-password-form label {
+    margin-bottom: 0;
+    margin-top: 2.5rem;
+}
+
+
+#login a {
+    color: var(--color-primary);
+}
+
+@media(min-width: 768px) {
+    .register-content > div {
+        width: 360px;
+    }
+}
+
+.register-content .login {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 1rem auto;
+    text-decoration: none;
+    width: fit-content;
+}
+
+.confirm-register-form div {
+    text-align: center;
+}
+
+.confirm-register-form a {
+    display: block;
+    margin-top: 2rem;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.form-error {
+    color: var(--color-error);
+    margin: .5rem 0;
+}
+
+@media(min-width: 391px) {
+    form,
+    .container {
+        max-width: 100%;
+        max-width: 100%;
+    }
+}
+
+.button {
+    text-decoration: none;
+}
+.forgotpass-nav-buttons {
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media(min-width: 768px) {
+    .forgotpass-nav-buttons {
+        flex-direction: row;
+    }
+}
+
+.username-preferences #email {
+    font-weight: 900;
+}
+
+.username-preferences #username {
+    display: block;
+    margin: 0 0 2rem;
+    padding: 0.8rem 0;
+    width: 300px;
+    word-break: break-word;
+}
+
+.username-preferences label[for="publicEmail"] {
+    width: 300px;
+}
+
+.username-preferences #publicEmail {
+    margin: 0.8rem auto;
+}
+
+[feedback-container] {
+    width: 300px;
+    margin: 16px 0;
+    border: 2px solid var(--color-black);
+    color: var(--color-black);
+    padding: 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    visibility: hidden;
+}
+
+[feedback-container].active {
+    visibility: visible;
+}
+
+#spinner.loading {
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: fixed;
+    right: 0;
+    transform: none;
+    top: 0;
+    z-index: 101;
+}

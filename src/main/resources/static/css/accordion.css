@@ -1,0 +1,156 @@
+.accordion-title,
+.filter-title {
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.filter-title {
+    border-bottom: 3px solid var(--color-white);
+}
+
+.accordion-controller {
+    display: none;
+}
+
+.accordion-title {
+    border-bottom: 1px solid var(--color-primary-100);
+    display: flex;
+}
+
+.accordion-title::after {
+    content: "";
+    font-size: var(--font-size-base);
+    transform: rotate(180deg);
+    transition: transform .3s ease-out;
+    position: relative;
+    background: url("/css/triangle.svg") no-repeat 96% #fff;
+    background-position: center;
+    background-color: transparent;
+    height: 20px;
+    width: 20px;
+    right: 0.6rem;
+    filter: invert(1);
+}
+
+.ocr-card .accordion-title::after {
+    filter: none;
+}
+
+.ocr-card .accordion-title::after {
+    width: 0; 
+    height: 0; 
+    border-left: 0.6rem solid transparent;
+    border-right: 0.6rem solid transparent;
+    border-top: 0.9rem solid var(--color-primary);
+}
+
+.accordion-controller:checked ~ .accordion-title::after {
+    transform:  rotate(0);
+    transition: transform .3s ease-out;
+}
+
+.leftnav[modal-open="modal-open"] #filter-title ~ .filter-title::after {
+    display: none;
+}
+
+@media(min-width: 768px) {
+    .filter-title::after {
+        display: none;
+    }
+}
+
+.leftnav[modal-open="modal-open"] #filter-title ~ .filtergroup {
+    transform: scaleY(1);
+    position: static;
+    transition: transform .1s ease-out, position .3s ease-out;
+    transform-origin:top;
+}
+
+@media(min-width: 768px) {
+    #filter-title ~ .filtergroup {
+        transform: scaleY(1);
+        position: static;
+        transition: transform .1s ease-out, position .3s ease-out;
+        transform-origin:top;
+    }
+}
+
+.accordion-option {
+    background-color: var(--color-grey-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3% 0 0;
+}
+
+input {
+    cursor: pointer;
+    margin: 0;
+}
+
+input[type="checkbox"].accordion-controller {
+    display: none;
+}
+
+#filter-title:checked ~ .filtergroup,
+.accordion-controller:checked ~ .options-container {
+    transform: scaleY(1);
+    transition: transform .3s ease-out;
+    transform-origin:top;
+    width: 100%;
+}
+
+.options-container {
+    transform: scaleY(0);
+    transition: transform .3s ease-out;
+    transform-origin:top;
+}
+
+.accordion-controller:checked ~ .options-container .accordion-option {
+    display: flex;
+    background-color: transparent;
+    color: var(--color-white);
+}
+
+.options-container .accordion-option {
+    display: none;
+}
+
+.options-container .accordion-option input[type="checkbox"], input[type="radio"] {
+    border: 1px solid var(--color-white);
+}
+
+.accordion-option label {
+    width: 100%;
+    display: inline-block;
+    padding: 14px 0 14px 40px;
+    cursor: pointer;
+}
+
+.accordion-option a {
+    width: 100%;
+    display: inline-block;
+    padding: 14px 0 14px 40px;
+    cursor: pointer;
+    color: var(--color-white);
+    text-decoration: none;
+}
+.accordion-option input.styled-input {
+    padding: 6px;
+}
+[period-filters] .accordion-option {
+    flex-direction: column;
+}
+
+[period-filters] input.styled-input {
+    width: calc(100% - 40px);
+    display: flex;
+    align-self: end;
+    color: var(--color-primary);
+    border-bottom: 5px solid var(--color-white);
+    background-color: var(--color-white);
+}
